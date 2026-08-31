@@ -1,4 +1,4 @@
-package br.com.gustavogoncalves.carteiradigital;
+package br.com.gustavogoncalves.carteiradigital.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -22,4 +22,12 @@ public class Conta {
     public String getCpf() { return cpf; }
     public String getTitular() { return titular; }
     public double getSaldo() { return saldo; }
+
+    public void sacar(double valor) {
+        this.saldo = this.saldo - valor;
+    }
+
+    public void depositar(double valor) {
+        this.saldo = this.saldo + valor;
+    }
 }

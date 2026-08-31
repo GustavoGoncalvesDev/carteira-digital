@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "cpf": "11122233344",
   "titular": "Gustavo",
-  "saldo": 500.50
+  "saldo": 500.00
 }
 
 ### 2. Criar a conta da Maria
@@ -23,3 +23,13 @@ GET http://localhost:8080/contas
 
 ### 4. Buscar APENAS a conta do Gustavo pelo CPF
 GET http://localhost:8080/contas/11122233344
+
+### 5. Fazer um PIX do Gustavo para a Maria
+POST http://localhost:8080/contas/transferencia
+Content-Type: application/json
+
+{
+  "cpfOrigem": "11122233344",
+  "cpfDestino": "99988877766",
+  "valor": 100.00
+}

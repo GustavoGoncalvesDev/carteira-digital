@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.Valid;
 
 import java.util.List;
 
@@ -36,10 +39,13 @@ public class ContaController {
         return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
     }
 
-    public record PedidoTransferencia(String cpfOrigem, String cpfDestino, double valor) {}
+    public record PedidoTransferencia(
+            @NotBlank String cpfOrigem,
+            @NotBlank String cpfDestino,
+            @Positive double valor) {}
 
     @PostMapping("/transferencia")
-    public ResponseEntity<String> transferirPix(@RequestBody PedidoTransferencia pedido) {
+    public ResponseEntity<String> transferirPix(@RequestBody @Valid PedidoTransferencia pedido) {
         String resultado = service.transferir(pedido.cpfOrigem(), pedido.cpfDestino(), pedido.valor());
 
         if (resultado.startsWith("Erro")) {

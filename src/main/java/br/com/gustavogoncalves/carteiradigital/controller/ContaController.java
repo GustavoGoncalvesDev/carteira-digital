@@ -3,6 +3,8 @@ package br.com.gustavogoncalves.carteiradigital.controller;
 import br.com.gustavogoncalves.carteiradigital.model.Conta;
 import br.com.gustavogoncalves.carteiradigital.service.ContaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,25 +17,35 @@ public class ContaController {
     private ContaService service;
 
     @GetMapping
-    public List<Conta> listarContas() {
-        return service.listarTodas();
+    public ResponseEntity<List<Conta>> listarContas() {
+        return ResponseEntity.ok(service.listarTodas());
     }
 
     @GetMapping("/{cpf}")
-    public Conta buscarPorCpf(@PathVariable String cpf) {
-        return service.buscarPorCpf(cpf);
+    public ResponseEntity<Conta> buscarPorCpf(@PathVariable String cpf) {
+        Conta conta = service.buscarPorCpf(cpf);
+        if (conta == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(conta);
     }
 
     @PostMapping
-    public String criarConta(@RequestBody Conta conta) {
-        service.salvar(conta);
-        return "Conta salva com sucesso!";
+    public ResponseEntity<Conta> criarConta(@RequestBody Conta conta) {
+        Conta novaConta = service.salvar(conta);
+        return ResponseEntity.status(HttpStatus.CREATED).body(novaConta);
     }
 
     public record PedidoTransferencia(String cpfOrigem, String cpfDestino, double valor) {}
 
     @PostMapping("/transferencia")
-    public String transferirPix(@RequestBody PedidoTransferencia pedido) {
-        return service.transferir(pedido.cpfOrigem(), pedido.cpfDestino(), pedido.valor());
+    public ResponseEntity<String> transferirPix(@RequestBody PedidoTransferencia pedido) {
+        String resultado = service.transferir(pedido.cpfOrigem(), pedido.cpfDestino(), pedido.valor());
+
+        if (resultado.startsWith("Erro")) {
+            return ResponseEntity.badRequest().body(resultado);
+        }
+
+        return ResponseEntity.ok(resultado);
     }
 }
